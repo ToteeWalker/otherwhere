@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Star Universe · Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500&family=Mitr:wght@400&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<style>
+  :root{--bg:#070914;--card:#10152e;--line:rgba(160,170,255,.16);--ink:#e8ebff;--dim:#8f96c4;
+    --gold:#ffd98a;--red:#ff6b81;--green:#7be0a6}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans Thai",system-ui,sans-serif;font-size:15px}
+  h1,h2{font-family:"Mitr",sans-serif;font-weight:400;margin:0}
+  h1{font-size:22px} h2{font-size:17px;margin-bottom:12px}
+  button,input{font:inherit;color:inherit}
+  .wrap{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  header h1 span{color:var(--gold)}
+  header .sp{flex:1}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:14px}
+  .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .stat{display:flex;gap:26px;flex-wrap:wrap}
+  .stat div{font-size:13px;color:var(--dim)} .stat b{display:block;font-family:"Mitr";font-weight:400;font-size:26px;color:var(--ink)}
+  .stat b.gold{color:var(--gold)}
+  label{font-size:13px;color:var(--dim);display:flex;flex-direction:column;gap:5px}
+  input{background:#0a0e22;border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+  input[type=number]{width:110px}
+  .btn{border:1px solid var(--line);background:#1a2150;border-radius:10px;padding:10px 16px;cursor:pointer;white-space:nowrap}
+  .btn:hover{filter:brightness(1.2)} .btn[disabled]{opacity:.4;pointer-events:none}
+  .btn.gold{background:var(--gold);color:#21170a;border-color:transparent}
+  .btn.red{background:transparent;color:var(--red);border-color:rgba(255,107,129,.45)}
+  .btn.red.fill{background:var(--red);color:#2a0710}
+  .btn.sm{padding:5px 10px;font-size:13px;border-radius:8px}
+  .danger{border-color:rgba(255,107,129,.3)}
+  .danger p{color:var(--dim);margin:4px 0 12px;font-size:14px;line-height:1.6}
+  .danger .row + .row{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .chip{border:1px solid var(--line);border-radius:99px;padding:6px 13px;cursor:pointer;background:transparent;font-size:13px}
+  .chip.on{background:var(--gold);color:#21170a;border-color:transparent}
+  .chip small{opacity:.7}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .tile{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#0a0e22}
+  .tile .img{position:relative;aspect-ratio:1;background:radial-gradient(closest-side,#1b2260,#0a0e22)}
+  .tile img{position:absolute;inset:10%;width:80%;height:80%;object-fit:contain}
+  .tile.hid img{opacity:.25;filter:grayscale(1)}
+  .tile .badge{position:absolute;top:8px;right:8px;font-size:11px;background:var(--red);color:#2a0710;border-radius:99px;padding:2px 8px}
+  .tile .meta{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;font-size:12px;color:var(--dim)}
+  .tile .acts{display:flex;gap:6px;padding:0 10px 10px}
+  .tile .acts .btn{flex:1}
+  .login{max-width:360px;margin:16vh auto 0;text-align:center}
+  .login input{width:100%;margin:16px 0 10px;text-align:center}
+  .login .btn{width:100%}
+  .msg{color:var(--red);font-size:14px;min-height:20px;margin-top:8px}
+  .empty{color:var(--dim);padding:20px 0;text-align:center}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#1e2660;border:1px solid var(--line);
+    padding:10px 18px;border-radius:12px;opacity:0;transition:.3s;pointer-events:none}
+  #toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- login -->
+  <div id="loginView" class="login" hidden>
+    <h1>✦ Star Universe <span>Admin</span></h1>
+    <input id="pw" type="password" placeholder="รหัสผ่านแอดมิน" autocomplete="current-password">
+    <button class="btn gold" id="loginBtn">เข้าสู่ระบบ</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+
+  <!-- main -->
+  <div id="mainView" hidden>
+    <header>
+      <h1>✦ Star Universe <span>Admin</span></h1>
+      <div class="sp"></div>
+      <button class="btn sm" id="refreshBtn">รีเฟรช</button>
+      <button class="btn sm" id="logoutBtn">ออกจากระบบ</button>
+    </header>
+
+    <div class="card">
+      <div class="stat">
+        <div>จักรวาลปัจจุบัน<b class="gold" id="sUni">–</b></div>
+        <div>ดาวในจักรวาลนี้<b id="sCount">–</b></div>
+        <div>ดาวทั้งหมดที่เคยส่ง<b id="sTotal">–</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>ตั้งค่า</h2>
+      <div class="row">
+        <label>ครบกี่ดวงเกิดหลุมดำ<input type="number" id="cfgTarget" min="1" max="200"></label>
+        <label>ส่งซ้ำได้ทุก (วินาที)<input type="number" id="cfgCooldown" min="0" max="3600"></label>
+        <button class="btn gold" id="saveCfg" style="align-self:flex-end">บันทึก</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>ดาวทั้งหมด</h2>
+      <div class="chips" id="chips"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+
+    <div class="card danger">
+      <h2 style="color:var(--red)">โซนอันตราย</h2>
+      <div class="row" style="justify-content:space-between">
+        <div><b>เริ่มจักรวาลใหม่ทันที</b>
+          <p>ล้างฟ้าบนจอโดยไม่ต้องรอให้ครบจำนวน ดาวของจักรวาลเดิมยังอยู่ในหน้าอ่านดาว</p></div>
+        <button class="btn red" id="newUniBtn">เริ่มจักรวาลใหม่</button>
+      </div>
+      <div class="row" style="justify-content:space-between">
+        <div><b>ล้างข้อมูลทั้งหมด</b>
+          <p>ลบภาพทุกภาพถาวร แล้วกลับไปเริ่มที่จักรวาลที่ 1 (ใช้ก่อนเปิดงานจริง) <b>ย้อนกลับไม่ได้</b><br>
+          พิมพ์คำว่า <b>RESET</b> ในช่องเพื่อยืนยัน</p></div>
+        <div class="row">
+          <input id="resetConfirm" placeholder="พิมพ์ RESET" style="width:130px">
+          <button class="btn red fill" id="resetBtn" disabled>ล้างทั้งหมด</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+(() => {
+'use strict';
+const CFG = window.STAR_CONFIG || {};
+const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, ''), KEY = CFG.SUPABASE_KEY || '';
+const $ = s => document.querySelector(s);
+const ss = { get(k){ try { return sessionStorage.getItem(k); } catch { return null; } },
+             set(k,v){ try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k,v); } catch {} } };
+let pw = ss.get('su_admin') || '', current = null, data = null;
+
+const ERR = { WRONG_PASSWORD: 'รหัสผ่านไม่ถูกต้อง',
+  NO_ADMIN_PASSWORD: 'ยังไม่ได้ตั้งรหัสผ่านแอดมิน (รัน admin_set_password ใน Supabase SQL Editor)' };
+
+async function rpc(fn, args = {}) {
+  const headers = { 'Content-Type': 'application/json', apikey: KEY };
+  if (KEY.startsWith('eyJ')) headers.Authorization = 'Bearer ' + KEY;
+  const r = await fetch(`${URL_}/rest/v1/rpc/${fn}`, { method: 'POST', headers, body: JSON.stringify({ p_password: pw, ...args }) });
+  const text = await r.text();
+  if (!r.ok) { let m = text; try { m = JSON.parse(text).message || text; } catch {} throw new Error(m); }
+  return text ? JSON.parse(text) : null;
+}
+const errText = e => ERR[e.message] || e.message || 'เกิดข้อผิดพลาด';
+let tt; function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('on'), 2500); }
+const fmt = d => new Date(d).toLocaleString('th-TH', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+
+function showLogin(msg = ''){ $('#loginView').hidden = false; $('#mainView').hidden = true; $('#loginMsg').textContent = msg; $('#pw').focus(); }
+
+async function load(){
+  try { data = await rpc('admin_overview'); }
+  catch (e) {
+    if (e.message === 'WRONG_PASSWORD' || e.message === 'NO_ADMIN_PASSWORD') { pw = ''; ss.set('su_admin', null); return showLogin(errText(e)); }
+    return toast(errText(e));
+  }
+  $('#loginView').hidden = true; $('#mainView').hidden = false;
+  const s = data.state;
+  $('#sUni').textContent = s.current_universe;
+  $('#sCount').textContent = `${s.star_count} / ${s.star_target}`;
+  $('#sTotal').textContent = data.total;
+  if (document.activeElement !== $('#cfgTarget')) $('#cfgTarget').value = s.star_target;
+  if (document.activeElement !== $('#cfgCooldown')) $('#cfgCooldown').value = s.cooldown_seconds;
+  const us = data.universes;
+  if (!us.length) { $('#chips').innerHTML = ''; $('#grid').innerHTML = '<div class="empty">ยังไม่มีดาว</div>'; return; }
+  if (!us.some(u => u.universe_id === current)) current = us[0].universe_id;
+  $('#chips').innerHTML = us.map(u => `<button class="chip ${u.universe_id === current ? 'on' : ''}" data-u="${u.universe_id}">
+     จักรวาลที่ ${u.universe_id} <small>· ${u.stars} ดวง${u.hidden ? ` · ซ่อน ${u.hidden}` : ''}</small></button>`).join('');
+  loadStars();
+}
+
+async function loadStars(){
+  const g = $('#grid');
+  try {
+    const stars = await rpc('admin_universe_stars', { p_universe: current });
+    g.innerHTML = stars.length ? stars.map(s => `
+      <div class="tile ${s.hidden ? 'hid' : ''}">
+        <div class="img"><img src="data:image/png;base64,${s.image}" alt="">${s.hidden ? '<span class="badge">ซ่อนอยู่</span>' : ''}</div>
+        <div class="meta"><span>#${s.star_index} · id ${s.id}</span><span>${fmt(s.created_at)}</span></div>
+        <div class="acts">
+          <button class="btn sm" data-act="hide" data-id="${s.id}" data-h="${!s.hidden}">${s.hidden ? 'แสดง' : 'ซ่อน'}</button>
+          <button class="btn sm red" data-act="del" data-id="${s.id}" data-n="${s.star_index}">ลบ</button>
+        </div>
+      </div>`).join('') : '<div class="empty">จักรวาลนี้ไม่มีดาว</div>';
+  } catch (e) { g.innerHTML = `<div class="empty">${errText(e)}</div>`; }
+}
+
+/* ---------- events ---------- */
+async function login(){
+  pw = $('#pw').value; $('#loginMsg').textContent = '';
+  $('#loginBtn').disabled = true;
+  try { await rpc('admin_overview'); ss.set('su_admin', pw); await load(); }
+  catch (e) { pw = ''; $('#loginMsg').textContent = errText(e); }
+  finally { $('#loginBtn').disabled = false; }
+}
+$('#loginBtn').onclick = login;
+$('#pw').onkeydown = e => { if (e.key === 'Enter') login(); };
+$('#logoutBtn').onclick = () => { pw = ''; ss.set('su_admin', null); $('#pw').value = ''; showLogin(); };
+$('#refreshBtn').onclick = () => load().then(() => toast('อัปเดตแล้ว'));
+
+$('#chips').onclick = e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  current = +c.dataset.u;
+  document.querySelectorAll('.chip').forEach(x => x.classList.toggle('on', x === c));
+  loadStars();
+};
+
+$('#grid').onclick = async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const id = +b.dataset.id;
+  try {
+    if (b.dataset.act === 'hide') {
+      await rpc('admin_set_hidden', { p_id: id, p_hidden: b.dataset.h === 'true' });
+      toast(b.dataset.h === 'true' ? 'ซ่อนแล้ว (หายจากจอและหน้าอ่านดาว)' : 'แสดงแล้ว');
+    } else {
+      if (!confirm(`ลบดาวดวงที่ ${b.dataset.n} ถาวร?`)) return;
+      await rpc('admin_delete_star', { p_id: id }); toast('ลบแล้ว');
+    }
+    load();
+  } catch (err) { toast(errText(err)); }
+};
+
+$('#saveCfg').onclick = async () => {
+  try {
+    await rpc('admin_set_config', { p_star_target: +$('#cfgTarget').value, p_cooldown: +$('#cfgCooldown').value });
+    toast('บันทึกแล้ว'); load();
+  } catch (e) { toast(errText(e)); }
+};
+
+$('#newUniBtn').onclick = async () => {
+  if (!confirm('เริ่มจักรวาลใหม่ทันที? ฟ้าบนจอจะว่าง')) return;
+  try { await rpc('admin_new_universe'); toast('เริ่มจักรวาลใหม่แล้ว'); current = null; load(); } catch (e) { toast(errText(e)); }
+};
+
+$('#resetConfirm').oninput = e => { $('#resetBtn').disabled = e.target.value.trim() !== 'RESET'; };
+$('#resetBtn').onclick = async () => {
+  try {
+    await rpc('admin_reset_all');
+    $('#resetConfirm').value = ''; $('#resetBtn').disabled = true;
+    toast('ล้างข้อมูลทั้งหมดแล้ว'); current = null; load();
+  } catch (e) { toast(errText(e)); }
+};
+
+/* ---------- start ---------- */
+if (!URL_ || !KEY) { showLogin('ยังไม่ได้ใส่ค่าใน config.js'); $('#loginBtn').disabled = true; }
+else if (pw) load(); else showLogin();
+setInterval(() => { if (!$('#mainView').hidden && !document.hidden) load(); }, 15000);
+})();
+</script>
+</body>
+</html>
