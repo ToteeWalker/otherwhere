@@ -492,7 +492,7 @@ function showResult(res){
   $('#resBig').textContent = `${res.star_index}/${res.star_target}`;
   if (res.is_last) {
     $('#resTitle').innerHTML = 'คุณคือดาวดวงสุดท้าย<br>ของมิตินี้';
-    $('#resText').innerHTML = `มิติที่ ${res.universe_id} เต็มแล้ว มองไปที่จอสิ<br>หลุมดำกำลังจะกำเนิด แล้วมิติใหม่จะเริ่มต้นอีกครั้ง ✦`;
+    $('#resText').innerHTML = `ภารกิจของมิติที่ ${res.universe_id} สำเร็จแล้ว<br>มองไปที่จอสิ อีกไม่นานจะเกิดปรากฏการณ์ GENESIS<br>แล้วมิติใหม่จะกำเนิดขึ้น ✦`;
   } else {
     $('#resTitle').innerHTML = 'ข้อความของคุณกำลัง<br>ถูกเปลี่ยนเป็นดวงดาว';
     $('#resText').innerHTML = `ดวงที่ ${res.star_index} ของมิติที่ ${res.universe_id} มอง<br>ไปที่มิติสิ ✦`;
