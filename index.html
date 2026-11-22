@@ -3,196 +3,222 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#05060f">
-<title>Star Universe</title>
+<meta name="theme-color" content="#03061a">
+<title>OTHERWHERE — a universe beyond our own</title>
+<link rel="preload" as="image" href="assets/bg-portrait.jpg" media="(orientation: portrait)">
+<link rel="preload" as="image" href="assets/bg.jpg" media="(orientation: landscape)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500&family=Mitr:wght@300;400;500&display=swap" rel="stylesheet">
+<!-- ฟอนต์สำรอง กรณี Adobe Fonts โหลดไม่ขึ้น -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<!-- Adobe Fonts kit: helvetica-neue-world (ไทย) + courier-new (อังกฤษ) -->
+<link rel="preconnect" href="https://use.typekit.net" crossorigin>
+<link rel="stylesheet" href="https://use.typekit.net/vzh8ghc.css">
 <script src="config.js"></script>
 <style>
   :root{
-    --bg0:#04050d; --bg1:#0a0f2a; --ink:#e8ebff; --dim:#8f96c4; --faint:#3a4070;
-    --gold:#ffd98a; --gold-glow:rgba(255,217,138,.45); --line:rgba(160,170,255,.16);
-    --card:rgba(18,24,60,.55);
+    --ink:#d5e3ff;            /* สีตัวอักษรหลัก (ฟ้าอ่อนตามตัวอย่าง) */
+    --ink-dim:rgba(213,227,255,.62);
+    --blue:#1233b8;           /* ตัวอักษรบนปุ่มขาว */
+    --orb:#1c0aa8;            /* วงกลมเลขมิติ */
+    --line:rgba(213,227,255,.22);
+    --bg-x:50%;               /* เลื่อนจุดโฟกัสภาพพื้นหลัง (แนวนอน) */
     --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+    --en:"courier-new","Courier New","Courier Prime",Courier,monospace;
+    --th:"helvetica-neue-world","Noto Sans Thai",sans-serif;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;height:100%;background:var(--bg0);color:var(--ink);
-    font-family:"IBM Plex Sans Thai",system-ui,sans-serif;font-weight:400;overscroll-behavior:none}
-  body{background:radial-gradient(120% 80% at 50% 0%,#141a48 0%,var(--bg1) 35%,var(--bg0) 100%) fixed}
-  h1,h2,h3,.display{font-family:"Mitr","IBM Plex Sans Thai",sans-serif;font-weight:400;margin:0}
-  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
-  #sky{position:fixed;inset:0;z-index:0;pointer-events:none}
-  .view{position:relative;z-index:1;min-height:100dvh;display:none;flex-direction:column;
-    padding:calc(16px + var(--safe-t)) 18px calc(18px + var(--safe-b));max-width:560px;margin:0 auto}
-  .view.on{display:flex}
-  .demo-tag{position:fixed;top:calc(8px + var(--safe-t));right:10px;z-index:5;font-size:11px;letter-spacing:.08em;
-    color:var(--gold);border:1px solid var(--gold-glow);border-radius:99px;padding:2px 9px;background:rgba(0,0,0,.4)}
+  html,body{margin:0;height:100%;background:#03061a;color:var(--ink);overscroll-behavior:none}
+  /* อักษรอังกฤษ/ตัวเลข = courier-new, อักษรไทยตกไปที่ฟอนต์ไทยเองอัตโนมัติ */
+  body{font-family:var(--en),var(--th);font-weight:400;font-style:normal}
+  .th{font-family:var(--th);font-weight:300}
+  button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+
+  /* ---------- background ---------- */
+  .bg{position:fixed;inset:0;z-index:0;background:#03061a url(assets/bg-portrait.jpg) var(--bg-x) center/cover no-repeat}
+  @media (orientation:landscape){ .bg{background-image:url(assets/bg.jpg)} }
+  .bg::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(3,6,26,.55) 0%,rgba(3,6,26,.25) 30%,rgba(3,6,26,.35) 60%,rgba(3,6,26,.8) 100%)}
+  body.dim .bg::after{background:rgba(3,6,26,.62)}
+  #sky{position:fixed;inset:0;z-index:1;pointer-events:none}
+
+  .view{position:relative;z-index:2;min-height:100dvh;display:none;flex-direction:column;align-items:center;
+    padding:calc(22px + var(--safe-t)) 24px calc(30px + var(--safe-b));max-width:520px;margin:0 auto}
+  .view.on{display:flex;animation:fade .5s ease both}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .demo-tag{position:fixed;top:calc(8px + var(--safe-t));left:10px;z-index:50;font:11px var(--en);letter-spacing:.12em;
+    color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:2px 7px;background:rgba(0,0,0,.35)}
 
   /* ---------- buttons ---------- */
-  .btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:58px;border-radius:999px;
-    font-family:"Mitr",sans-serif;font-size:18px;letter-spacing:.01em;transition:transform .15s,opacity .2s,box-shadow .3s}
+  .btn{display:flex;align-items:center;justify-content:center;gap:10px;width:min(240px,64vw);min-height:54px;border-radius:8px;
+    background:#fff;color:var(--blue);font-family:var(--th);font-weight:300;font-size:21px;
+    box-shadow:0 10px 40px -12px rgba(150,175,255,.55);transition:transform .15s,opacity .2s}
   .btn:active{transform:scale(.97)}
-  .btn[disabled]{opacity:.35;pointer-events:none}
-  .btn-primary{background:linear-gradient(180deg,#ffe7b3,#f3c46a);color:#21170a;
-    box-shadow:0 0 0 1px rgba(255,230,170,.6) inset,0 8px 40px -6px var(--gold-glow)}
-  .btn-ghost{border:1px solid var(--line);background:rgba(20,26,70,.35);backdrop-filter:blur(6px)}
-  .topbar{display:flex;align-items:center;gap:8px;min-height:44px;margin-bottom:6px}
-  .back{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:var(--dim)}
-  .topbar .title{flex:1;font-family:"Mitr";font-size:17px;color:var(--dim)}
-  .topbar .title b{color:var(--ink);font-weight:400}
+  .btn[disabled]{opacity:.45;pointer-events:none}
+  .btn.small{font-size:18px;min-height:50px}
+  .link{margin-top:16px;font-family:var(--th);font-weight:300;font-size:15px;color:var(--ink-dim);
+    text-decoration:underline;text-underline-offset:5px;text-decoration-color:var(--line);padding:6px}
+  .bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%}
 
-  /* ---------- home ---------- */
-  #home{justify-content:space-between;text-align:center}
-  .hero{margin-top:12vh}
-  .hero .spark{font-size:30px;color:var(--gold);text-shadow:0 0 18px var(--gold)}
-  .hero h1{font-size:44px;line-height:1.05;margin-top:10px;letter-spacing:.01em}
-  .hero p{color:var(--dim);font-size:16px;line-height:1.65;margin:16px auto 0;max-width:20em}
-  .status{margin:34px auto 0}
-  .status .label{font-size:14px;color:var(--dim);margin-bottom:12px}
-  .status .label b{color:var(--ink);font-weight:500}
-  .dots{display:flex;flex-wrap:wrap;justify-content:center;gap:9px;max-width:270px;margin:0 auto}
-  .dots i{width:9px;height:9px;border-radius:50%;background:var(--faint)}
-  .dots i.lit{background:var(--gold);box-shadow:0 0 10px var(--gold)}
-  .actions{display:flex;flex-direction:column;gap:12px;margin-top:40px}
+  .logo-s{display:block;width:118px;height:auto;margin:0 auto}
+  .logo-s img{width:100%;display:block}
+
+  /* ---------- start ---------- */
+  #start .logo-l{margin-top:16vh;width:min(330px,82vw)}
+  #start .logo-l img{width:100%;display:block;filter:drop-shadow(0 0 30px rgba(120,150,255,.35))}
+
+  /* ---------- intro ---------- */
+  #intro .copy{margin:auto 0;text-align:center;font-family:var(--en),var(--th);font-weight:300;font-size:17px;line-height:1.85;
+    max-width:24em;text-shadow:0 2px 18px rgba(0,0,0,.6)}
+  #intro .copy .th{font-weight:300}
 
   /* ---------- draw ---------- */
-  #draw{gap:12px}
-  .pad-wrap{position:relative;width:100%;aspect-ratio:1/1;max-width:calc(100dvh - 300px - var(--safe-t) - var(--safe-b));
-    min-width:240px;margin:0 auto;align-self:center}
-  #pad{width:100%;height:100%;display:block;border-radius:28px;touch-action:none;
-    background:radial-gradient(closest-side,rgba(40,50,120,.35),rgba(10,14,40,.6));
-    box-shadow:0 0 0 1px var(--line) inset,0 20px 60px -20px rgba(0,0,0,.8)}
-  .pad-hint{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;color:var(--dim);
-    font-size:15px;text-align:center;line-height:1.7;transition:opacity .4s}
+  #draw{gap:14px}
+  .counter{font-family:var(--en),var(--th);font-size:15px;letter-spacing:.02em;color:var(--ink);margin-top:6px}
+  .counter .th{font-weight:300}
+  .pad-wrap{position:relative;width:100%;aspect-ratio:1/1;max-width:calc(100dvh - 330px - var(--safe-t) - var(--safe-b));
+    min-width:250px;margin:4px auto 0}
+  #pad{width:100%;height:100%;display:block;border-radius:6px;touch-action:none;
+    background:rgba(8,14,52,.42);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    box-shadow:0 0 0 1px var(--line) inset,0 24px 60px -24px rgba(0,0,0,.9)}
+  .pad-hint{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;color:var(--ink-dim);
+    font-family:var(--th);font-weight:300;font-size:16px;text-align:center;line-height:1.75;transition:opacity .4s}
   .pad-hint.gone{opacity:0}
-  .tools{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .swatches{display:flex;gap:8px}
-  .sw{width:30px;height:30px;border-radius:50%;box-shadow:0 0 0 2px transparent,0 0 0 1px rgba(255,255,255,.15) inset;transition:box-shadow .2s,transform .2s}
-  .sw.on{box-shadow:0 0 0 2px var(--bg0),0 0 0 4px currentColor;transform:scale(1.08)}
-  .tool-btns{display:flex;gap:4px}
-  .tbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--dim);font-size:18px}
-  .tbtn.on{color:var(--ink);background:rgba(255,255,255,.08)}
-  .tbtn svg{width:20px;height:20px}
-  .send-row{margin-top:auto}
+  .tools{display:flex;align-items:center;justify-content:space-between;width:100%;
+    max-width:calc(100dvh - 330px - var(--safe-t) - var(--safe-b));min-width:250px;margin-top:-4px}
+  .tbtn{width:44px;height:44px;display:grid;place-items:center;color:#fff;margin:0 -8px}
+  .tbtn svg{width:26px;height:26px}
+  .tbtn[disabled]{opacity:.3;pointer-events:none}
 
-  /* ---------- result overlay ---------- */
-  .fly{position:fixed;z-index:20;pointer-events:none;filter:drop-shadow(0 0 10px rgba(255,255,255,.7))}
-  .flystar{position:fixed;z-index:21;width:14px;height:14px;border-radius:50%;pointer-events:none;
-    background:#fff;box-shadow:0 0 12px 4px #fff,0 0 40px 12px var(--c,#ffd98a)}
-  #result{position:fixed;inset:0;z-index:15;display:none;flex-direction:column;align-items:center;justify-content:center;
-    text-align:center;padding:24px 26px calc(24px + var(--safe-b));background:radial-gradient(80% 60% at 50% 40%,rgba(20,26,72,.92),rgba(4,5,13,.97));backdrop-filter:blur(6px)}
-  #result.on{display:flex;animation:fade .6s ease both}
-  #result .big{font-family:"Mitr";font-size:64px;line-height:1;color:var(--gold);text-shadow:0 0 30px var(--gold-glow)}
-  #result .big small{font-size:22px;color:var(--dim)}
-  #result h2{font-size:24px;margin-top:18px;line-height:1.4}
-  #result p{color:var(--dim);line-height:1.7;margin:12px 0 0;max-width:20em}
-  #result .actions{width:100%;max-width:420px}
-  @keyframes fade{from{opacity:0}to{opacity:1}}
+  /* ---------- after transform ---------- */
+  .fly{position:fixed;z-index:60;pointer-events:none;filter:drop-shadow(0 0 10px rgba(255,255,255,.8))}
+  .flystar{position:fixed;z-index:61;width:14px;height:14px;border-radius:50%;pointer-events:none;
+    background:#fff;box-shadow:0 0 12px 4px #fff,0 0 40px 14px rgba(160,185,255,.9)}
+  #result{position:fixed;inset:0;z-index:40;display:none;flex-direction:column;align-items:center;
+    text-align:center;padding:calc(22px + var(--safe-t)) 26px calc(30px + var(--safe-b));overflow:hidden}
+  #result::before{content:"";position:absolute;inset:-40px;z-index:-1;background:inherit;
+    background:#03061a url(assets/bg-portrait.jpg) var(--bg-x) center/cover no-repeat;filter:blur(18px) brightness(.75)}
+  @media (orientation:landscape){ #result::before{background-image:url(assets/bg.jpg)} }
+  #result::after{content:"";position:absolute;inset:0;z-index:-1;background:rgba(3,6,26,.35)}
+  #result.on{display:flex;animation:fade .7s ease both}
+  #result .mid{margin:auto 0;display:flex;flex-direction:column;align-items:center}
+  #result .big{font-family:var(--en);font-size:76px;line-height:1;letter-spacing:-.02em;color:#fff;
+    text-shadow:0 0 34px rgba(170,195,255,.6)}
+  #result h2{font-family:var(--th);font-weight:300;font-size:21px;line-height:1.6;margin:26px 0 0;max-width:13em}
+  #result p{font-family:var(--en),var(--th);font-weight:300;font-size:13px;color:var(--ink-dim);line-height:1.7;margin:14px 0 0;max-width:20em}
+  #result .bottom{margin-top:0;gap:12px}
 
-  /* ---------- archive ---------- */
-  .list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
-  .uni{display:flex;align-items:center;gap:14px;text-align:left;padding:16px;border-radius:20px;background:var(--card);
-    border:1px solid var(--line);width:100%}
-  .uni .orb{width:46px;height:46px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:"Mitr";font-size:18px;
-    background:radial-gradient(circle at 35% 30%,#2b3580,#0d1236);box-shadow:0 0 0 1px var(--line) inset}
-  .uni.done .orb{background:radial-gradient(circle,#000 45%,#2a1d40 70%,#5a3d7a);box-shadow:0 0 18px -2px #7a55b0}
-  .uni .meta{flex:1;min-width:0}
-  .uni .meta b{font-family:"Mitr";font-weight:400;font-size:17px}
-  .uni .meta div{color:var(--dim);font-size:13px;margin-top:3px}
-  .tag{font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
-  .tag.live{color:var(--gold);border-color:var(--gold-glow)}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-top:10px}
-  .tile{position:relative;aspect-ratio:1;border-radius:18px;background:radial-gradient(closest-side,rgba(40,50,120,.4),rgba(10,14,40,.7));
-    border:1px solid var(--line);overflow:hidden}
-  .tile img{position:absolute;inset:12%;width:76%;height:76%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(255,255,255,.35))}
-  .tile span{position:absolute;left:9px;top:7px;font-size:11px;color:var(--dim)}
-  .empty{color:var(--dim);text-align:center;margin-top:30vh;line-height:1.8}
-  .sub{color:var(--dim);font-size:14px;margin:2px 0 4px}
-  #lightbox{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;align-items:center;justify-content:center;
-    background:rgba(3,4,12,.92);padding:24px}
+  /* ---------- star storage ---------- */
+  .topbar{display:flex;align-items:center;gap:6px;width:100%;min-height:46px;margin-bottom:14px}
+  .back{width:40px;height:44px;display:grid;place-items:center;margin-left:-10px;color:#fff}
+  .back svg{width:22px;height:22px}
+  .topbar .title{flex:1;font-family:var(--en),var(--th);font-weight:400;font-size:20px}
+  .topbar .title .th{font-weight:300}
+  .topbar .logo-s{width:84px;margin:0}
+  .list{display:flex;flex-direction:column;gap:12px;width:100%}
+  .uni{display:flex;align-items:center;gap:14px;text-align:left;padding:12px 14px 12px 12px;border-radius:8px;background:#fff;
+    color:var(--blue);width:100%;box-shadow:0 10px 30px -16px rgba(0,0,0,.8)}
+  .uni:active{transform:scale(.985)}
+  .uni .orb{width:56px;height:56px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--en);
+    font-size:26px;color:#fff;background:var(--orb)}
+  .uni.done .orb{background:radial-gradient(circle,#000 42%,#16104a 70%,#2b2390);box-shadow:0 0 14px -2px #3b2fd0}
+  .uni .meta{flex:1;min-width:0;line-height:1.45}
+  .uni .meta .row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+  .uni .meta b{font-family:var(--en),var(--th);font-weight:400;font-size:18px}
+  .uni .meta .when{font-family:var(--en),var(--th);font-weight:300;font-size:13px;color:#3a4fae;white-space:nowrap}
+  .tag{font-family:var(--th);font-weight:300;font-size:11px;text-align:right;white-space:nowrap;color:var(--blue)}
+  .tag.done{color:#8a93b8}
+  .sub{font-family:var(--en),var(--th);font-weight:300;color:var(--ink-dim);font-size:14px;width:100%;margin:-6px 0 4px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:10px;width:100%;margin-top:8px}
+  .tile{position:relative;aspect-ratio:1;border-radius:6px;background:rgba(8,14,52,.5);backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);box-shadow:0 0 0 1px var(--line) inset;overflow:hidden}
+  .tile img{position:absolute;inset:12%;width:76%;height:76%;object-fit:contain;filter:drop-shadow(0 0 6px rgba(255,255,255,.45))}
+  .tile span{position:absolute;left:8px;top:6px;font:11px var(--en);color:var(--ink-dim)}
+  .empty{font-family:var(--th);font-weight:300;color:var(--ink-dim);text-align:center;margin-top:26vh;line-height:1.8;width:100%}
+  #lightbox{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;
+    background:rgba(3,6,26,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding:24px}
   #lightbox.on{display:flex;animation:fade .3s both}
-  #lightbox img{width:min(86vw,60vh);aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 0 14px rgba(255,255,255,.45))}
-  #lightbox p{color:var(--dim);margin-top:18px;font-size:14px}
+  #lightbox img{width:min(86vw,60vh);aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 0 14px rgba(255,255,255,.5))}
+  #lightbox p{font-family:var(--en),var(--th);font-weight:300;color:var(--ink-dim);margin-top:18px;font-size:14px}
 
-  #toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translate(-50%,20px);z-index:40;opacity:0;
-    background:#1a2050;border:1px solid var(--line);padding:12px 18px;border-radius:14px;font-size:15px;transition:.3s;
-    max-width:90vw;text-align:center;pointer-events:none}
+  #toast{position:fixed;left:50%;bottom:calc(24px + var(--safe-b));transform:translate(-50%,20px);z-index:80;opacity:0;
+    background:#fff;color:var(--blue);font-family:var(--th);padding:12px 18px;border-radius:8px;font-size:15px;transition:.3s;
+    max-width:90vw;text-align:center;pointer-events:none;box-shadow:0 10px 30px -10px rgba(0,0,0,.6)}
   #toast.on{opacity:1;transform:translate(-50%,0)}
-  .spin{width:22px;height:22px;border-radius:50%;border:2px solid rgba(0,0,0,.2);border-top-color:#21170a;animation:sp 1s linear infinite}
+  .spin{width:22px;height:22px;border-radius:50%;border:2px solid rgba(18,51,184,.2);border-top-color:var(--blue);animation:sp 1s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
+<div class="bg"></div>
 <canvas id="sky"></canvas>
 <div id="demoTag" class="demo-tag" hidden>DEMO</div>
 
-<!-- ================= HOME ================= -->
-<section id="home" class="view">
-  <div class="hero">
-    <div class="spark">✦</div>
-    <h1>Star Universe</h1>
-    <p>วาดหรือเขียนสิ่งที่อยากบอก<br>แล้วปล่อยให้มันลอยขึ้นไปเป็นดาวบนจอ</p>
-    <div class="status">
-      <div class="label" id="homeLabel">กำลังเชื่อมต่อจักรวาล…</div>
-      <div class="dots" id="homeDots"></div>
-    </div>
+<!-- ================= START ================= -->
+<section id="start" class="view">
+  <div class="logo-l"><img src="assets/logo.png" alt="OTHERWHERE — a universe beyond our own"></div>
+  <div class="bottom">
+    <button class="btn" data-go="#/intro">เริ่ม</button>
+    <button class="link" data-go="#/archive">อ่านดาวที่ผ่านมา</button>
   </div>
-  <div class="actions">
-    <button class="btn btn-primary" data-go="#/draw">✦ วาดดาวของฉัน</button>
-    <button class="btn btn-ghost" data-go="#/archive">อ่านดาวที่ผ่านมา</button>
+</section>
+
+<!-- ================= INTRO ================= -->
+<section id="intro" class="view">
+  <a class="logo-s" href="#/"><img src="assets/logo.png" alt="OTHERWHERE"></a>
+  <p class="copy">ยินดีต้อนรับสู่ No Name พื้นที่ ที่จะทำให้<br>จินตนาการและข้อความของคุณไปสู่ดวงดาว</p>
+  <div class="bottom" style="margin-top:0">
+    <button class="btn" data-go="#/draw">ถัดไป</button>
   </div>
 </section>
 
 <!-- ================= DRAW ================= -->
 <section id="draw" class="view">
-  <div class="topbar">
-    <button class="back" data-go="#/" aria-label="กลับ">‹</button>
-    <div class="title" id="drawTitle">ดาวดวงใหม่</div>
-  </div>
+  <a class="logo-s" href="#/"><img src="assets/logo.png" alt="OTHERWHERE"></a>
+  <div class="counter" id="drawTitle">&nbsp;</div>
   <div class="pad-wrap">
     <canvas id="pad"></canvas>
     <div class="pad-hint" id="padHint">ใช้นิ้ววาดหรือเขียน<br>อะไรก็ได้ตรงนี้</div>
   </div>
   <div class="tools">
-    <div class="swatches" id="swatches"></div>
-    <div class="tool-btns">
-      <button class="tbtn" id="sizeBtn" aria-label="ขนาดเส้น">
-        <svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="3" fill="currentColor" id="sizeDot"/></svg></button>
-      <button class="tbtn" id="undoBtn" aria-label="ย้อนกลับ">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5 3 9l4 4"/><path d="M3 9h9a5 5 0 0 1 0 10h-2"/></svg></button>
-      <button class="tbtn" id="clearBtn" aria-label="ล้าง">
-        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11"/></svg></button>
-    </div>
+    <button class="tbtn" id="undoBtn" aria-label="ย้อนกลับ" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5 4 9l4 4"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>
+    <button class="tbtn" id="clearBtn" aria-label="ล้าง" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M9 6V4h6v2"/><path d="M6 6l1 15h10l1-15"/><path d="M10 10v8M14 10v8"/></svg></button>
   </div>
-  <div class="send-row">
-    <button class="btn btn-primary" id="sendBtn" disabled>ส่งขึ้นฟ้า ✦</button>
+  <div class="bottom">
+    <button class="btn" id="sendBtn" disabled>ส่ง</button>
   </div>
 </section>
 
+<!-- ================= AFTER TRANSFORM ================= -->
 <div id="result">
-  <div class="big" id="resBig"></div>
-  <h2 id="resTitle"></h2>
-  <p id="resText"></p>
-  <div class="actions">
-    <button class="btn btn-primary" id="againBtn">วาดอีกดวง</button>
-    <button class="btn btn-ghost" data-go="#/archive">อ่านดาวที่ผ่านมา</button>
+  <div class="mid">
+    <div class="big" id="resBig"></div>
+    <h2 id="resTitle"></h2>
+    <p id="resText"></p>
+  </div>
+  <div class="bottom">
+    <button class="btn small" id="againBtn">วาดอีกครั้ง</button>
+    <button class="btn small" data-go="#/archive">อ่านดาวที่ผ่านมา</button>
   </div>
 </div>
 
-<!-- ================= ARCHIVE ================= -->
+<!-- ================= STAR STORAGE ================= -->
 <section id="archive" class="view">
   <div class="topbar">
-    <button class="back" data-go="#/" aria-label="กลับ">‹</button>
-    <div class="title"><b>ดาวที่ผ่านมา</b></div>
+    <button class="back" data-go="#/" aria-label="กลับ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button>
+    <div class="title"><span class="th">ดาวที่ผ่านมา</span></div>
   </div>
   <div class="list" id="uniList"></div>
 </section>
 
 <section id="universe" class="view">
   <div class="topbar">
-    <button class="back" data-go="#/archive" aria-label="กลับ">‹</button>
-    <div class="title"><b id="uniTitle"></b></div>
+    <button class="back" data-go="#/archive" aria-label="กลับ">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 7 12l8 8"/></svg></button>
+    <div class="title" id="uniTitle"></div>
   </div>
   <div class="sub" id="uniSub"></div>
   <div class="grid" id="uniGrid"></div>
@@ -208,7 +234,8 @@ const CFG  = window.STAR_CONFIG || {};
 const URL_ = (CFG.SUPABASE_URL || '').replace(/\/+$/, '');
 const KEY  = CFG.SUPABASE_KEY || '';
 const DEMO = !URL_ || !KEY;
-const COLORS = ['#ffffff', '#ffd98a', '#ff9fb8', '#9fd8ff', '#b9a6ff', '#a6ffcf'];
+const INK = '#ffffff';          // ใช้สีขาวสีเดียว
+const BRUSH = 0.022;            // ขนาดเส้นคงที่ (สัดส่วนของ canvas)
 const $ = s => document.querySelector(s);
 
 /* ---------------- storage (safe) ---------------- */
@@ -237,22 +264,22 @@ async function rpc(fn, args = {}) {
   return text ? JSON.parse(text) : null;
 }
 
-/* ---------------- background sky ---------------- */
+/* ---------------- twinkle layer over BG ---------------- */
 const sky = $('#sky'), sctx = sky.getContext('2d');
 let skyStars = [];
 function sizeSky(){
   const d = Math.min(devicePixelRatio || 1, 2);
   sky.width = innerWidth * d; sky.height = innerHeight * d;
   sctx.setTransform(d,0,0,d,0,0);
-  const n = Math.round(innerWidth * innerHeight / 5500);
+  const n = Math.round(innerWidth * innerHeight / 9000);
   skyStars = Array.from({length:n}, () => ({x:Math.random()*innerWidth, y:Math.random()*innerHeight,
-    r:Math.random()*1.1+.2, p:Math.random()*6.28, s:Math.random()*.8+.3}));
+    r:Math.random()*1+.2, p:Math.random()*6.28, s:Math.random()*.7+.2}));
 }
 function drawSky(t){
   sctx.clearRect(0,0,innerWidth,innerHeight);
+  sctx.fillStyle = '#e6edff';
   for (const s of skyStars){
-    const a = .25 + .75 * (.5 + .5*Math.sin(t/1000*s.s + s.p));
-    sctx.globalAlpha = a; sctx.fillStyle = '#dfe4ff';
+    sctx.globalAlpha = .1 + .6 * (.5 + .5*Math.sin(t/1000*s.s + s.p));
     sctx.beginPath(); sctx.arc(s.x, s.y, s.r, 0, 6.283); sctx.fill();
   }
   sctx.globalAlpha = 1;
@@ -273,57 +300,38 @@ document.addEventListener('click', e => {
 });
 function show(id){
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === id));
+  document.body.classList.toggle('dim', id === 'archive' || id === 'universe');
   window.scrollTo(0,0);
 }
-async function route(){
+function route(){
   const h = location.hash || '#/';
   $('#result').classList.remove('on'); $('#lightbox').classList.remove('on');
   let m;
-  if (h === '#/draw') { show('draw'); enterDraw(); }
+  if (h === '#/intro') show('intro');
+  else if (h === '#/draw') { show('draw'); enterDraw(); }
   else if (h === '#/archive') { show('archive'); loadArchive(); }
   else if ((m = h.match(/^#\/u\/(\d+)$/))) { show('universe'); loadUniverse(+m[1]); }
-  else { show('home'); loadHome(); }
+  else show('start');
 }
 addEventListener('hashchange', route);
 
-/* ---------------- home ---------------- */
 let state = null;
 async function refreshState(){
   try { state = await rpc('get_state'); } catch (e) { console.warn(e); }
   return state;
 }
-async function loadHome(){
-  const s = await refreshState();
-  if (!s) { $('#homeLabel').textContent = 'เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง'; return; }
-  $('#homeLabel').innerHTML = `จักรวาลที่ <b>${s.current_universe}</b> · ดาว <b>${s.star_count}</b> / ${s.star_target} ดวง`;
-  $('#homeDots').innerHTML = Array.from({length:s.star_target}, (_,i) => `<i class="${i < s.star_count ? 'lit' : ''}"></i>`).join('');
-}
-setInterval(() => { if ($('#home').classList.contains('on')) loadHome(); }, 6000);
 
 /* ---------------- drawing pad ---------------- */
 const pad = $('#pad'), pctx = pad.getContext('2d');
 const base = document.createElement('canvas'), bctx = base.getContext('2d'); // committed strokes
-const SIZES = [0.012, 0.022, 0.04];                 // line width as fraction of pad size
-let strokes = [], cur = null, color = COLORS[0], sizeI = 1, padW = 0, dirty = false, sending = false;
+let strokes = [], cur = null, dirty = false, sending = false;
 
-$('#swatches').innerHTML = COLORS.map((c,i) =>
-  `<button class="sw${i?'':' on'}" style="background:${c};color:${c}" data-c="${c}" aria-label="สี ${i+1}"></button>`).join('');
-$('#swatches').addEventListener('click', e => {
-  const b = e.target.closest('.sw'); if (!b) return;
-  color = b.dataset.c;
-  document.querySelectorAll('.sw').forEach(x => x.classList.toggle('on', x === b));
-});
-$('#sizeBtn').addEventListener('click', () => {
-  sizeI = (sizeI + 1) % SIZES.length;
-  $('#sizeDot').setAttribute('r', [2, 3.5, 6][sizeI]);
-});
 $('#undoBtn').addEventListener('click', () => { strokes.pop(); renderBase(); });
 $('#clearBtn').addEventListener('click', () => { strokes = []; renderBase(); });
 
 function sizePad(){
   const r = pad.getBoundingClientRect(); if (!r.width) return;
   const d = Math.min(devicePixelRatio || 1, 3);
-  padW = r.width;
   pad.width = base.width = Math.round(r.width * d);
   pad.height = base.height = Math.round(r.height * d);
   renderBase();
@@ -344,7 +352,7 @@ function pathStroke(ctx, st, S){
   const l = p[p.length-1]; ctx.lineTo(l[0]*S, l[1]*S); ctx.stroke();
 }
 function glowStroke(ctx, st, S){
-  ctx.save(); ctx.shadowColor = st.c; ctx.shadowBlur = S * 0.02; pathStroke(ctx, st, S); ctx.restore();
+  ctx.save(); ctx.shadowColor = 'rgba(170,195,255,.9)'; ctx.shadowBlur = S * 0.025; pathStroke(ctx, st, S); ctx.restore();
 }
 function renderBase(){
   bctx.clearRect(0,0,base.width,base.height);
@@ -369,6 +377,7 @@ function inkLength(){
 }
 function updateUI(){
   $('#sendBtn').disabled = sending || inkLength() < 0.08;
+  $('#undoBtn').disabled = $('#clearBtn').disabled = sending || !strokes.length;
   $('#padHint').classList.toggle('gone', strokes.length > 0 || !!cur);
 }
 
@@ -384,7 +393,7 @@ function ptr(e){ const r = pad.getBoundingClientRect(); return [(e.clientX - r.l
 pad.addEventListener('pointerdown', e => {
   if (activeId !== null || sending) return;
   activeId = e.pointerId; pad.setPointerCapture(e.pointerId);
-  cur = { c: color, w: SIZES[sizeI], pts: [ptr(e)] };
+  cur = { c: INK, w: BRUSH, pts: [ptr(e)] };
   dirty = true; updateUI(); pingTyping();
 });
 pad.addEventListener('pointermove', e => {
@@ -427,8 +436,11 @@ function cooldownLeft(){
 async function enterDraw(){
   requestAnimationFrame(sizePad);
   const s = await refreshState();
-  $('#drawTitle').innerHTML = s ? `ดาวดวงที่ <b>${s.star_count + 1}</b> / ${s.star_target} · จักรวาลที่ ${s.current_universe}` : 'ดาวดวงใหม่';
+  $('#drawTitle').innerHTML = s
+    ? `<span class="th">ดาวดวงที่</span> ${s.star_count + 1} / ${s.star_target} &nbsp;<span class="th">มิติที่</span> ${s.current_universe}`
+    : '<span class="th">ดาวดวงใหม่</span>';
 }
+setInterval(() => { if ($('#draw').classList.contains('on') && !sending) enterDraw(); }, 8000);
 
 $('#sendBtn').addEventListener('click', async () => {
   if (sending || !strokes.length) return;
@@ -437,11 +449,10 @@ $('#sendBtn').addEventListener('click', async () => {
   sending = true; updateUI();
   const btn = $('#sendBtn'); btn.innerHTML = '<span class="spin"></span>';
   const dataUrl = exportPNG();
-  const mainColor = strokes[strokes.length-1].c;
   try {
-    const res = await rpc('submit_star', { p_image: dataUrl.split(',')[1], p_color: mainColor, p_client_id: clientId });
+    const res = await rpc('submit_star', { p_image: dataUrl.split(',')[1], p_color: INK, p_client_id: clientId });
     store.set('su_last', Date.now());
-    await flyAway(mainColor);
+    await flyAway();
     strokes = []; renderBase();
     showResult(res);
   } catch (e) {
@@ -449,12 +460,12 @@ $('#sendBtn').addEventListener('click', async () => {
     if (m) { store.set('su_last', Date.now() - ((state?.cooldown_seconds||30) - +m[1])*1000); toast(`รออีก ${m[1]} วินาที ก่อนส่งดาวดวงใหม่นะ`); }
     else { console.error(e); toast('ส่งไม่สำเร็จ ลองใหม่อีกครั้งนะ'); }
   } finally {
-    sending = false; btn.textContent = 'ส่งขึ้นฟ้า ✦'; updateUI();
+    sending = false; btn.textContent = 'ส่ง'; updateUI();
   }
 });
 
 // the drawing shrinks into a star and flies up (mirrors what happens on the big screen)
-function flyAway(c){
+function flyAway(){
   return new Promise(resolve => {
     const r = pad.getBoundingClientRect();
     const img = document.createElement('canvas'); img.width = pad.width; img.height = pad.height;
@@ -466,7 +477,7 @@ function flyAway(c){
       {duration:900,easing:'cubic-bezier(.6,0,.3,1)',fill:'forwards'});
     a1.onfinish = () => {
       img.remove();
-      const s = document.createElement('div'); s.className = 'flystar'; s.style.setProperty('--c', c);
+      const s = document.createElement('div'); s.className = 'flystar';
       s.style.left = (r.left + r.width/2 - 7) + 'px'; s.style.top = (r.top + r.height/2 - 7) + 'px';
       document.body.appendChild(s);
       const a2 = s.animate([{transform:'translateY(0) scale(1)',opacity:1},{transform:`translateY(${-r.top-r.height/2-40}px) scale(.4)`,opacity:0}],
@@ -478,13 +489,13 @@ function flyAway(c){
 
 let cdTimer;
 function showResult(res){
-  $('#resBig').innerHTML = `${res.star_index}<small> / ${res.star_target}</small>`;
+  $('#resBig').textContent = `${res.star_index}/${res.star_target}`;
   if (res.is_last) {
-    $('#resTitle').textContent = 'คุณคือดาวดวงสุดท้าย';
-    $('#resText').textContent = `จักรวาลที่ ${res.universe_id} เต็มแล้ว มองขึ้นไปที่จอ หลุมดำกำลังจะกำเนิด และจักรวาลใหม่จะเริ่มต้นอีกครั้ง`;
+    $('#resTitle').innerHTML = 'คุณคือดาวดวงสุดท้าย<br>ของมิตินี้';
+    $('#resText').innerHTML = `มิติที่ ${res.universe_id} เต็มแล้ว มองไปที่จอสิ<br>หลุมดำกำลังจะกำเนิด แล้วมิติใหม่จะเริ่มต้นอีกครั้ง ✦`;
   } else {
-    $('#resTitle').textContent = 'ดาวของคุณกำลังเกิด';
-    $('#resText').textContent = `ดวงที่ ${res.star_index} ของจักรวาลที่ ${res.universe_id} มองขึ้นไปที่จอสิ ✦`;
+    $('#resTitle').innerHTML = 'ข้อความของคุณกำลัง<br>ถูกเปลี่ยนเป็นดวงดาว';
+    $('#resText').innerHTML = `ดวงที่ ${res.star_index} ของมิติที่ ${res.universe_id} มอง<br>ไปที่มิติสิ ✦`;
   }
   $('#result').classList.add('on');
   const btn = $('#againBtn');
@@ -492,14 +503,14 @@ function showResult(res){
   const tick = () => {
     const left = cooldownLeft();
     btn.disabled = left > 0;
-    btn.textContent = left > 0 ? `วาดอีกดวงได้ใน ${left} วิ` : 'วาดอีกดวง';
+    btn.textContent = left > 0 ? `วาดอีกครั้งได้ใน ${left} วิ` : 'วาดอีกครั้ง';
     if (!left) clearInterval(cdTimer);
   };
   tick(); cdTimer = setInterval(tick, 500);
 }
 $('#againBtn').addEventListener('click', () => { $('#result').classList.remove('on'); enterDraw(); });
 
-/* ---------------- archive ---------------- */
+/* ---------------- star storage ---------------- */
 const fmtD = d => new Date(d).toLocaleDateString('th-TH', {day:'numeric', month:'short'});
 const fmtT = d => new Date(d).toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -512,16 +523,17 @@ async function loadArchive(){
     el.innerHTML = list.map(u => `
       <button class="uni ${u.complete ? 'done' : ''}" data-go="#/u/${u.universe_id}">
         <div class="orb">${u.universe_id}</div>
-        <div class="meta"><b>จักรวาลที่ ${u.universe_id}</b>
-          <div>${u.stars} ดวง · ${fmtD(u.started_at)} ${fmtT(u.started_at)}–${fmtT(u.ended_at)}</div></div>
-        <span class="tag ${u.complete ? '' : 'live'}">${u.complete ? 'ถูกหลุมดำกลืนแล้ว' : 'กำลังก่อตัว'}</span>
+        <div class="meta">
+          <div class="row"><b>มิติที่ ${u.universe_id}</b>
+            <span class="tag ${u.complete ? 'done' : ''}">${u.complete ? 'ถูกหลุมดำกลืนแล้ว' : 'กำลังก่อตัว'}</span></div>
+          <div class="when">${u.stars} ดวง · ${fmtD(u.started_at)} ${fmtT(u.started_at)}–${fmtT(u.ended_at)}</div></div>
       </button>`).join('');
   } catch (e) { console.error(e); el.innerHTML = '<div class="empty">โหลดไม่สำเร็จ ลองใหม่อีกครั้ง</div>'; }
 }
 
 let uniStars = [];
 async function loadUniverse(n){
-  $('#uniTitle').textContent = `จักรวาลที่ ${n}`;
+  $('#uniTitle').textContent = `มิติที่ ${n}`;
   $('#uniSub').textContent = ''; const g = $('#uniGrid'); g.innerHTML = '';
   try {
     uniStars = await rpc('get_universe_stars', { p_universe: n });
@@ -542,37 +554,36 @@ $('#lightbox').addEventListener('click', () => $('#lightbox').classList.remove('
 
 /* ---------------- DEMO backend (ใช้เมื่อยังไม่ใส่ config) ---------------- */
 const Demo = (() => {
-  const st = { current_universe: 1, star_count: 0, star_target: 20, cooldown_seconds: 5 };
+  const st = { current_universe: 1, star_count: 0, star_target: 10, cooldown_seconds: 5 };
   const stars = []; let id = 0;
   const wait = v => new Promise(r => setTimeout(() => r(v), 250));
   function scribble(seed){
     let s = seed * 9301 + 49297; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
-    const c = COLORS[Math.floor(rnd()*COLORS.length)], list = [];
+    const list = [];
     for (let k = 0, n = 1 + Math.floor(rnd()*3); k < n; k++) {
       const pts = []; let x = .3+rnd()*.4, y = .3+rnd()*.4, a = rnd()*6.28;
       for (let i = 0; i < 40; i++) { a += (rnd()-.5)*.9; x += Math.cos(a)*.02; y += Math.sin(a)*.02; pts.push([x,y]); }
-      list.push({ c, w: .025, pts });
+      list.push({ c: INK, w: BRUSH, pts });
     }
-    return { c, img: exportPNG(list, 256).split(',')[1] };
+    return exportPNG(list, 256).split(',')[1];
   }
-  function add(image, color, client){
+  function add(image, client){
     const now = new Date(Date.now() - (60 - id) * 60000).toISOString();
-    const row = { id: ++id, universe_id: st.current_universe, star_index: st.star_count + 1, color, image, client, created_at: now };
+    const row = { id: ++id, universe_id: st.current_universe, star_index: st.star_count + 1, color: INK, image, client, created_at: now };
     stars.push(row);
     if (row.star_index >= st.star_target) { st.current_universe++; st.star_count = 0; } else st.star_count++;
     return row;
   }
-  for (let i = 0; i < 27; i++) { const d = scribble(i+1); add(d.img, d.c, 'seed'); }
-  const fixTime = r => (r.created_at = r.created_at, r);
+  for (let i = 0; i < 13; i++) add(scribble(i+1), 'seed');
   return {
     get_state: () => wait({ ...st }),
     ping_typing: () => wait(null),
-    submit_star({ p_image, p_color, p_client_id }){
+    submit_star({ p_image, p_client_id }){
       const last = stars.filter(s => s.client === p_client_id).pop();
       if (last && Date.now() - Date.parse(last.created_at) < st.cooldown_seconds*1000)
         return Promise.reject(new Error('COOLDOWN:' + Math.ceil((Date.parse(last.created_at) + st.cooldown_seconds*1000 - Date.now())/1000)));
-      const target = st.star_target, r = add(p_image, p_color, p_client_id);
-      r.created_at = new Date().toISOString(); fixTime(r);
+      const target = st.star_target, r = add(p_image, p_client_id);
+      r.created_at = new Date().toISOString();
       return wait({ id: r.id, universe_id: r.universe_id, star_index: r.star_index, star_target: target, is_last: r.star_index >= target });
     },
     list_universes(){
